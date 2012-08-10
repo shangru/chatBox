@@ -66,6 +66,12 @@ public class ChatServerNewServlet extends HttpServlet {
             String value = "";
             switch (type){
             case 't':
+            	if (syncCache.contains (Long.MIN_VALUE)){
+            		timeStamp = Long.parseLong((String) (syncCache.get(Long.MIN_VALUE)));
+            	} else {
+            		timeStamp = 0;
+            		syncCache.put(Long.MIN_VALUE, "0");
+            	}
             	value += timeStamp;
             	break;
             
@@ -79,7 +85,14 @@ public class ChatServerNewServlet extends HttpServlet {
             	} else {
             		start += "message=".length();
             		value = inString.substring(start)+"<Msg>";
+                	if (syncCache.contains (Long.MIN_VALUE)){
+                		timeStamp = Long.parseLong((String) (syncCache.get(Long.MIN_VALUE)));
+                	} else {
+                		timeStamp = 0;
+                		syncCache.put(Long.MIN_VALUE, "0");
+                	}
             		timeStamp ++;
+            		syncCache.put(Long.MIN_VALUE, ""+timeStamp);
             		syncCache.put(timeStamp, value);
             		if (syncCache.contains(timeStamp - LIMIT)){
             			syncCache.delete(timeStamp - LIMIT);
