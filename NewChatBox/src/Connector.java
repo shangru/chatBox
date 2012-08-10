@@ -8,8 +8,8 @@ import java.net.URLEncoder;
 
 
 public class Connector {
-	public static final String urlString = "http://localhost:8888/chatserver";
-	
+	//public static final String urlString = "http://localhost:8888/chatservernew";
+	public static final String urlString = "http://ting-yun.appspot.com/chatservernew";
 	public static long getTimeStamp (){
         try{
             

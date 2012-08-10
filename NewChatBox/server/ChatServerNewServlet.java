@@ -3,19 +3,24 @@ package com.miao.chatserver;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URLDecoder;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.logging.Level;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.*;
+
+import com.google.appengine.api.memcache.ErrorHandlers;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
 
 
 
 @SuppressWarnings("serial")
 public class ChatServerNewServlet extends HttpServlet {
+	
+	
 	private long timeStamp = 0;
-	private LinkedList<String> list = new LinkedList<String> ();
+
 	private static String message = "Error during Servlet processing";
 	private final static int LIMIT = 50;
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -25,6 +30,9 @@ public class ChatServerNewServlet extends HttpServlet {
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException{
+		MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+		syncCache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
+		
 		try {
             int len = req.getContentLength();
             if (len < 1){
@@ -71,20 +79,24 @@ public class ChatServerNewServlet extends HttpServlet {
             	} else {
             		start += "message=".length();
             		value = inString.substring(start)+"<Msg>";
-            		list.add(value);
-            		if (list.size() > LIMIT){
-            			list.removeFirst();
-            		}
             		timeStamp ++;
+            		syncCache.put(timeStamp, value);
+            		if (syncCache.contains(timeStamp - LIMIT)){
+            			syncCache.delete(timeStamp - LIMIT);
+            		}
             		return ;
             	}
  
             
             case 'r':
+            	
             	StringBuffer sb = new StringBuffer ();
-            	Iterator <String> it = list.iterator();
-            	while (it.hasNext()){
-            		sb.append(it.next());
+            	for (long i = timeStamp - 49; i <= timeStamp; i++){
+            		Object temp =  syncCache.get(i);
+            		if (temp == null){
+            			continue;
+            		}
+            		sb.append ((String)temp);
             	}
             	
             	value = sb.toString();

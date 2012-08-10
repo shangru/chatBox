@@ -144,7 +144,6 @@ public class UI extends JFrame implements ActionListener, MouseListener, KeyList
 		Border margin = new EmptyBorder(5, 5, 5, 5);
 		Border compound = new CompoundBorder(line, margin);
 		scroll.setBorder(compound);
-		UIManager.getLookAndFeelDefaults().put( "ScrollBar.thumb", Color.blue ); 
 		
 		line = new LineBorder(Color.BLACK);
 		margin = new EmptyBorder(1, 2, 2, 2);
@@ -227,6 +226,9 @@ public class UI extends JFrame implements ActionListener, MouseListener, KeyList
 	}
 	
 	private void setMessage (Message []messages){
+		if (messages == null){
+			return;
+		}
 		int i = 0;
 		StringBuffer sb = new StringBuffer ();
 		while (i < messages.length){

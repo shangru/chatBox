@@ -40,7 +40,10 @@ public class MessageHelper {
 	}
 	
 	public static Message [] resolveAllMessage (String receivedMessage){
-		//System.out.println(receivedMessage);
+		if (receivedMessage.length() < 10){
+			return null;
+		}
+		//System.out.println("11 "+receivedMessage);
 		String [] splited = receivedMessage.split("<Msg>");
 		Message [] msgs = new Message [splited.length];
 		for (int i = 0 ; i < splited.length; i++){
